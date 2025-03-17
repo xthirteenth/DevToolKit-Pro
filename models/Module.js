@@ -17,7 +17,34 @@ const Module = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isIn: [["CSS", "JavaScript", "React", "HTML", "Utility", "Other"]],
+        isIn: [
+          [
+            // Языки программирования
+            "JavaScript",
+            "TypeScript",
+            "Python",
+            "C++",
+            "C",
+            "Rust",
+            "R",
+            "Ruby",
+            "Solidity",
+            "Java",
+            "C#",
+            "Go",
+            // Фреймворки и библиотеки
+            "React",
+            "CSS",
+            "PyTorch",
+            "Tailwind",
+            "Node.js",
+            "Express",
+            "Matplotlib",
+            "HTML",
+            "Utility",
+            "Other",
+          ],
+        ],
       },
     },
     content: {
