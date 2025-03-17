@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider, useThemeContext } from "./context/ThemeContext";
+import { ModulesProvider } from "./context/ModulesContext";
+import { AuthProvider } from "./context/AuthContext";
 
-function App() {
-  const [count, setCount] = useState(0)
+import AppLayout from "./components/layout/AppLayout";
+import HomePage from "./components/pages/HomePage";
+import ModulesPage from "./components/pages/ModulesPage";
+import CalculatorPage from "./components/pages/CalculatorPage";
+import SettingsPage from "./components/pages/SettingsPage";
+import ProfilePage from "./components/pages/ProfilePage";
+import LoginPage from "./components/pages/LoginPage";
+import RegisterPage from "./components/pages/RegisterPage";
+import CookieConsent from "./components/common/CookieConsent";
 
+function AppWithTheme() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <AuthProvider>
+        <ModulesProvider>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/modules" element={<ModulesPage />} />
+              <Route path="/calculator" element={<CalculatorPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Routes>
+          </AppLayout>
+          <CookieConsent />
+        </ModulesProvider>
+      </AuthProvider>
+    </Router>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <ThemeProvider>
+      <AppWithTheme />
+    </ThemeProvider>
+  );
+}
+
+export default App;

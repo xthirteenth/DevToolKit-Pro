@@ -1,12 +1,130 @@
-# React + Vite
+# DevToolkit Pro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Многофункциональное приложение для разработчиков, включающее в себя набор полезных инструментов, калькулятор и систему модулей.
 
-Currently, two official plugins are available:
+## Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Аутентификация пользователей (регистрация, вход, профиль)
+- Установка и использование модулей с кодом
+- Калькулятор для разработчиков
+- Настройки приложения с выбором темы (светлая, темная, ретро)
+- Адаптивный дизайн для мобильных устройств
 
-## Expanding the ESLint configuration
+## Технологии
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Клиентская часть
+
+- React
+- Material-UI
+- React Router
+- Context API для управления состоянием
+
+### Серверная часть
+
+- Node.js
+- Express
+- PostgreSQL
+- Sequelize ORM
+- JWT для аутентификации
+
+## Установка и запуск
+
+### Предварительные требования
+
+- Node.js (версия 14 или выше)
+- PostgreSQL (версия 12 или выше)
+
+### Установка зависимостей
+
+```bash
+# Установка зависимостей проекта
+npm install
+
+# Установка Vite (если требуется для клиентской части)
+npm install -D vite @vitejs/plugin-react
+```
+
+### Настройка окружения
+
+1. Создайте файл `.env` в корневой директории проекта со следующими параметрами:
+
+```
+PORT=5000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=devtoolkit
+DB_USER=postgres
+DB_PASSWORD=postgres
+JWT_SECRET=your-super-secret-key-change-in-production
+```
+
+### Настройка базы данных PostgreSQL
+
+1. Установите PostgreSQL, если он еще не установлен
+2. Создайте базу данных:
+
+```bash
+# Подключение к PostgreSQL
+psql -U postgres
+
+# Создание базы данных
+CREATE DATABASE devtoolkit;
+
+# Выход из psql
+\q
+```
+
+### Заполнение базы данных тестовыми данными
+
+```bash
+# Запуск скрипта для заполнения базы данных
+node scripts/seedDatabase.js
+```
+
+### Запуск приложения
+
+```bash
+# Запуск сервера
+npm run dev
+
+# В отдельном терминале запуск клиентской части (если используется Vite)
+npm run client
+# или
+npx vite
+```
+
+После запуска серверная часть будет доступна по адресу `http://localhost:5000`, а клиентская часть (при использовании Vite) - по адресу `http://localhost:5173`.
+
+### Тестовый пользователь
+
+После заполнения базы данных тестовыми данными вы можете войти в систему, используя следующие учетные данные:
+
+- Имя пользователя: `testuser`
+- Пароль: `password123`
+
+## Структура проекта
+
+```
+devtoolkit-pro/
+├── public/                  # Статические файлы
+├── src/                     # Исходный код клиентской части
+│   ├── components/          # React компоненты
+│   │   ├── common/          # Общие компоненты
+│   │   ├── layout/          # Компоненты макета
+│   │   └── pages/           # Компоненты страниц
+│   ├── context/             # Контексты React
+│   ├── App.jsx              # Главный компонент приложения
+│   └── main.jsx             # Точка входа клиентской части
+├── config/                  # Конфигурация сервера
+├── models/                  # Модели Sequelize
+├── routes/                  # Маршруты API
+├── middleware/              # Middleware
+├── scripts/                 # Скрипты для работы с данными
+├── server.js                # Точка входа сервера
+├── vite.config.js           # Конфигурация Vite
+└── package.json             # Зависимости и скрипты
+```
+
+## Лицензия
+
+MIT
