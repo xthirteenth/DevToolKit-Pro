@@ -107,6 +107,39 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  // Получение пароля пользователя
+  const getUserPassword = async () => {
+    if (!isAuthenticated || !token) {
+      return null;
+    }
+
+    try {
+      const res = await axios.get(`${API_URL}/auth/password`);
+      return res.data.password;
+    } catch (err) {
+      console.error("Ошибка при получении пароля:", err);
+      return null;
+    }
+  };
+
+  // Смена пароля пользователя
+  const changePassword = async (currentPassword, newPassword) => {
+    if (!isAuthenticated || !token) {
+      throw new Error("Пользователь не авторизован");
+    }
+
+    try {
+      const res = await axios.post(`${API_URL}/auth/change-password`, {
+        currentPassword,
+        newPassword,
+      });
+      return res.data;
+    } catch (err) {
+      console.error("Ошибка при смене пароля:", err);
+      throw err;
+    }
+  };
+
   // Значение контекста
   const contextValue = {
     user,
@@ -118,6 +151,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    getUserPassword,
+    changePassword,
   };
 
   return (

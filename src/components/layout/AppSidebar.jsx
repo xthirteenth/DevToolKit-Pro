@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
@@ -13,6 +13,12 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import ExtensionIcon from "@mui/icons-material/Extension";
@@ -48,6 +54,9 @@ export default function AppSidebar({ open, handleDrawerToggle, drawerWidth }) {
   const isRetroTheme = currentTheme === "retro";
   const { isAuthenticated, logout } = useAuth();
 
+  // Состояние для модального окна подтверждения выхода
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
   // Определение фактической ширины drawer в зависимости от темы и устройства
   const actualDrawerWidth = isRetroTheme && isMobile ? 80 : drawerWidth;
 
@@ -67,17 +76,38 @@ export default function AppSidebar({ open, handleDrawerToggle, drawerWidth }) {
     menuItems.push({ text: "Войти", icon: <LoginIcon />, path: "/login" });
   }
 
-  const handleNavigation = (path) => {
-    if (path === "/logout") {
-      logout();
-      navigate("/");
-    } else {
-      navigate(path);
-    }
+  // Обработчик для открытия диалога подтверждения выхода
+  const handleLogoutClick = () => {
+    setLogoutDialogOpen(true);
 
-    // Закрываем drawer на мобильных устройствах после выбора пункта меню
+    // Закрываем drawer на мобильных устройствах
     if (isMobile) {
       handleDrawerToggle();
+    }
+  };
+
+  // Обработчик для закрытия диалога без выхода
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  // Обработчик для подтверждения выхода
+  const handleLogoutConfirm = () => {
+    logout();
+    setLogoutDialogOpen(false);
+    navigate("/");
+  };
+
+  const handleNavigation = (path) => {
+    if (path === "/logout") {
+      handleLogoutClick();
+    } else {
+      navigate(path);
+
+      // Закрываем drawer на мобильных устройствах после выбора пункта меню
+      if (isMobile) {
+        handleDrawerToggle();
+      }
     }
   };
 
@@ -163,43 +193,69 @@ export default function AppSidebar({ open, handleDrawerToggle, drawerWidth }) {
   );
 
   return (
-    <Box
-      component="nav"
-      sx={{ width: { sm: actualDrawerWidth }, flexShrink: { sm: 0 } }}
-    >
-      {/* Мобильная версия */}
-      <Drawer
-        variant="temporary"
-        open={open}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Лучшая производительность на мобильных
-        }}
-        sx={{
-          display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: actualDrawerWidth,
-          },
-        }}
+    <>
+      <Box
+        component="nav"
+        sx={{ width: { sm: actualDrawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
       >
-        {drawer}
-      </Drawer>
+        {/* Мобильная версия */}
+        <Drawer
+          variant="temporary"
+          open={open}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Лучшая производительность на мобильных устройствах
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: actualDrawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
 
-      {/* Десктопная версия */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: "none", sm: "block" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: actualDrawerWidth,
-          },
-        }}
-        open
+        {/* Десктопная версия */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: actualDrawerWidth,
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      {/* Диалог подтверждения выхода */}
+      <Dialog
+        open={logoutDialogOpen}
+        onClose={handleLogoutCancel}
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description"
       >
-        {drawer}
-      </Drawer>
-    </Box>
+        <DialogTitle id="logout-dialog-title">Подтверждение выхода</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="logout-dialog-description">
+            Вы действительно хотите выйти из аккаунта?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLogoutCancel} color="primary">
+            Отмена
+          </Button>
+          <Button onClick={handleLogoutConfirm} color="error" autoFocus>
+            Выйти
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

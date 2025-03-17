@@ -16,10 +16,8 @@ import {
   Alert,
   Snackbar,
 } from "@mui/material";
-import { useAuth } from "../../context/AuthContext";
 
 const SettingsPage = () => {
-  const { user } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [language, setLanguage] = useState("ru");
@@ -101,29 +99,6 @@ const SettingsPage = () => {
               </Select>
             </FormControl>
           </Grid>
-
-          {user && (
-            <>
-              <Grid item xs={12}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Информация о пользователе
-                </Typography>
-                <Typography variant="body1">
-                  Имя пользователя: <strong>{user.username}</strong>
-                </Typography>
-                <Typography variant="body1">
-                  Email: <strong>{user.email}</strong>
-                </Typography>
-                <Typography variant="body1">
-                  Установленных модулей:{" "}
-                  <strong>
-                    {user.installedModules ? user.installedModules.length : 0}
-                  </strong>
-                </Typography>
-              </Grid>
-            </>
-          )}
 
           <Grid item xs={12} sx={{ mt: 2 }}>
             <Button

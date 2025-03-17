@@ -207,7 +207,10 @@ export const ModulesProvider = ({ children }) => {
   // Загружаем установленные модули из данных пользователя
   useEffect(() => {
     if (isAuthenticated && user) {
-      setInstalledModules(user.installedModules || []);
+      // Используем setTimeout для обеспечения правильного порядка обновления состояния
+      setTimeout(() => {
+        setInstalledModules(user.installedModules || []);
+      }, 0);
     } else {
       setInstalledModules([]);
     }
@@ -218,18 +221,22 @@ export const ModulesProvider = ({ children }) => {
     // Проверяем, авторизован ли пользователь
     if (!isAuthenticated) {
       alert("Для установки модуля необходимо авторизоваться");
-      return;
+      return false;
     }
 
     // Проверяем, не установлен ли уже модуль
     if (installedModules.includes(moduleId)) {
-      return;
+      return true;
     }
 
     // Показываем индикатор загрузки
     setIsInstalling(true);
 
     try {
+      // Оптимистичное обновление UI
+      const updatedModules = [...installedModules, moduleId];
+      setInstalledModules(updatedModules);
+
       // Отправляем запрос на сервер
       const response = await axios.post(
         `${API_URL}/modules/${moduleId}/install`
@@ -239,18 +246,34 @@ export const ModulesProvider = ({ children }) => {
 
       // Обновляем данные пользователя
       if (updateUser && response.data.user) {
-        updateUser(response.data.user);
+        // Используем setTimeout для обеспечения правильного порядка обновления состояния
+        setTimeout(() => {
+          updateUser(response.data.user);
+        }, 0);
       }
 
-      // Обновляем список установленных модулей
-      setInstalledModules(response.data.installedModules || []);
+      // Обновляем список установленных модулей с данными с сервера
+      if (response.data.installedModules) {
+        // Используем setTimeout для обеспечения правильного порядка обновления состояния
+        setTimeout(() => {
+          setInstalledModules(response.data.installedModules);
+        }, 0);
+      }
 
       // Скрываем индикатор загрузки
       setIsInstalling(false);
+
+      return true;
     } catch (error) {
       console.error("Ошибка при установке модуля:", error);
+
+      // Откатываем оптимистичное обновление в случае ошибки
+      const originalModules = installedModules.filter((id) => id !== moduleId);
+      setInstalledModules(originalModules);
+
       setIsInstalling(false);
       alert("Ошибка при установке модуля. Попробуйте позже.");
+      return false;
     }
   };
 
@@ -259,10 +282,22 @@ export const ModulesProvider = ({ children }) => {
     // Проверяем, авторизован ли пользователь
     if (!isAuthenticated) {
       alert("Для удаления модуля необходимо авторизоваться");
-      return;
+      return false;
     }
 
+    // Проверяем, установлен ли модуль
+    if (!installedModules.includes(moduleId)) {
+      return true;
+    }
+
+    // Показываем индикатор загрузки
+    setIsInstalling(true);
+
     try {
+      // Оптимистичное обновление UI
+      const updatedModules = installedModules.filter((id) => id !== moduleId);
+      setInstalledModules(updatedModules);
+
       // Отправляем запрос на сервер
       const response = await axios.delete(
         `${API_URL}/modules/${moduleId}/uninstall`
@@ -272,14 +307,34 @@ export const ModulesProvider = ({ children }) => {
 
       // Обновляем данные пользователя
       if (updateUser && response.data.user) {
-        updateUser(response.data.user);
+        // Используем setTimeout для обеспечения правильного порядка обновления состояния
+        setTimeout(() => {
+          updateUser(response.data.user);
+        }, 0);
       }
 
-      // Обновляем список установленных модулей
-      setInstalledModules(response.data.installedModules || []);
+      // Обновляем список установленных модулей с данными с сервера
+      if (response.data.installedModules) {
+        // Используем setTimeout для обеспечения правильного порядка обновления состояния
+        setTimeout(() => {
+          setInstalledModules(response.data.installedModules);
+        }, 0);
+      }
+
+      // Скрываем индикатор загрузки
+      setIsInstalling(false);
+
+      return true;
     } catch (error) {
       console.error("Ошибка при удалении модуля:", error);
+
+      // Откатываем оптимистичное обновление в случае ошибки
+      const originalModules = [...installedModules, moduleId];
+      setInstalledModules(originalModules);
+
+      setIsInstalling(false);
       alert("Ошибка при удалении модуля. Попробуйте позже.");
+      return false;
     }
   };
 

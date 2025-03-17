@@ -22,6 +22,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Divider from "@mui/material/Divider";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
   const [time, setTime] = useState(new Date());
@@ -35,6 +40,9 @@ export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
   // Состояние для меню пользователя
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  // Состояние для модального окна подтверждения выхода
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -93,14 +101,21 @@ export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
     setAnchorEl(null);
   };
 
-  const handleProfile = () => {
-    navigate("/profile");
+  // Обработчик для открытия диалога подтверждения выхода
+  const handleLogoutClick = () => {
     handleClose();
+    setLogoutDialogOpen(true);
   };
 
-  const handleLogout = () => {
+  // Обработчик для закрытия диалога без выхода
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  // Обработчик для подтверждения выхода
+  const handleLogoutConfirm = () => {
     logout();
-    handleClose();
+    setLogoutDialogOpen(false);
     navigate("/");
   };
 
@@ -113,108 +128,76 @@ export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
   };
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        width: { sm: `calc(100% - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
-        height: isRetroTheme && isMobile ? "30px" : { xs: "40px", sm: "50px" },
-      }}
-    >
-      <Toolbar
-        disableGutters
-        variant="dense"
+    <>
+      <AppBar
+        position="fixed"
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          minHeight:
-            isRetroTheme && isMobile
-              ? "30px !important"
-              : { xs: "40px !important", sm: "50px !important" },
-          padding:
-            isRetroTheme && isMobile
-              ? "0px 8px !important"
-              : { xs: "0px 8px !important", sm: "0px 16px !important" },
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+          height:
+            isRetroTheme && isMobile ? "30px" : { xs: "40px", sm: "50px" },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 1, display: { sm: "none" } }}
-            size={isMobile ? "small" : "medium"}
-          >
-            <MenuIcon fontSize={isMobile ? "small" : "medium"} />
-          </IconButton>
-          <Typography
-            variant={isMobile ? "subtitle1" : "h6"}
-            noWrap
-            component="div"
-            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
-          >
-            DevToolkit Pro
-          </Typography>
-        </Box>
-
-        <Box
-          sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}
+        <Toolbar
+          disableGutters
+          variant="dense"
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            minHeight:
+              isRetroTheme && isMobile
+                ? "30px !important"
+                : { xs: "40px !important", sm: "50px !important" },
+            padding:
+              isRetroTheme && isMobile
+                ? "0px 8px !important"
+                : { xs: "0px 8px !important", sm: "0px 16px !important" },
+          }}
         >
-          <Tooltip title={getThemeTooltip()}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               color="inherit"
-              onClick={toggleTheme}
-              aria-label="toggle theme"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 1, display: { sm: "none" } }}
               size={isMobile ? "small" : "medium"}
             >
-              {getThemeIcon()}
+              <MenuIcon fontSize={isMobile ? "small" : "medium"} />
             </IconButton>
-          </Tooltip>
-
-          {!isMobile && (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? "rgba(0, 0, 0, 0.3)"
-                    : "rgba(255, 255, 255, 0.2)",
-                borderRadius: "16px",
-                padding: { xs: "2px 8px", sm: "4px 12px" },
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              }}
+            <Typography
+              variant={isMobile ? "subtitle1" : "h6"}
+              noWrap
+              component="div"
+              sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
             >
-              <TimerIcon
-                sx={{
-                  mr: { xs: 0.5, sm: 1 },
-                  color: theme.palette.secondary.main,
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                }}
-              />
-              <Typography
-                variant="body2"
-                component="div"
-                sx={{
-                  fontFamily: "monospace",
-                  fontWeight: "bold",
-                  letterSpacing: "0.05em",
-                  fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
-                }}
-              >
-                {formatTime(time)}
-              </Typography>
-            </Box>
-          )}
+              DevToolkit Pro
+            </Typography>
+          </Box>
 
-          {isAuthenticated && user ? (
-            <>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 1, sm: 2 },
+            }}
+          >
+            <Tooltip title={getThemeTooltip()}>
+              <IconButton
+                color="inherit"
+                onClick={toggleTheme}
+                aria-label="toggle theme"
+                size={isMobile ? "small" : "medium"}
+              >
+                {getThemeIcon()}
+              </IconButton>
+            </Tooltip>
+
+            {!isMobile && (
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  cursor: "pointer",
                   backgroundColor:
                     theme.palette.mode === "dark"
                       ? "rgba(0, 0, 0, 0.3)"
@@ -223,12 +206,11 @@ export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
                   padding: { xs: "2px 8px", sm: "4px 12px" },
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
-                onClick={handleMenu}
               >
-                <AccountCircleIcon
+                <TimerIcon
                   sx={{
                     mr: { xs: 0.5, sm: 1 },
-                    color: theme.palette.primary.main,
+                    color: theme.palette.secondary.main,
                     fontSize: { xs: "1rem", sm: "1.25rem" },
                   }}
                 />
@@ -236,65 +218,126 @@ export default function AppNavbar({ drawerWidth, handleDrawerToggle }) {
                   variant="body2"
                   component="div"
                   sx={{
+                    fontFamily: "monospace",
                     fontWeight: "bold",
+                    letterSpacing: "0.05em",
                     fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
                   }}
                 >
-                  {user.username}
+                  {formatTime(time)}
                 </Typography>
               </Box>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleProfile}>Профиль</MenuItem>
-                <Divider />
-                <MenuItem onClick={handleLogout}>Выйти</MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="outlined"
-                color="inherit"
-                size={isMobile ? "small" : "medium"}
-                onClick={handleLogin}
-                sx={{
-                  fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                  padding: { xs: "2px 8px", sm: "4px 10px" },
-                }}
-              >
-                Войти
-              </Button>
-              {!isMobile && (
+            )}
+
+            {isAuthenticated && user ? (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(0, 0, 0, 0.3)"
+                        : "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "16px",
+                    padding: { xs: "2px 8px", sm: "4px 12px" },
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                  onClick={handleMenu}
+                >
+                  <AccountCircleIcon
+                    sx={{
+                      mr: { xs: 0.5, sm: 1 },
+                      color: theme.palette.primary.main,
+                      fontSize: { xs: "1rem", sm: "1.25rem" },
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
+                    }}
+                  >
+                    {user.username}
+                  </Typography>
+                </Box>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={open}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleLogoutClick}>Выйти</MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Box sx={{ display: "flex", gap: 1 }}>
                 <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={handleRegister}
+                  variant="outlined"
+                  color="inherit"
+                  size={isMobile ? "small" : "medium"}
+                  onClick={handleLogin}
                   sx={{
                     fontSize: { xs: "0.7rem", sm: "0.8rem" },
                     padding: { xs: "2px 8px", sm: "4px 10px" },
                   }}
                 >
-                  Регистрация
+                  Войти
                 </Button>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+                {!isMobile && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={handleRegister}
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                      padding: { xs: "2px 8px", sm: "4px 10px" },
+                    }}
+                  >
+                    Регистрация
+                  </Button>
+                )}
+              </Box>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Диалог подтверждения выхода */}
+      <Dialog
+        open={logoutDialogOpen}
+        onClose={handleLogoutCancel}
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description"
+      >
+        <DialogTitle id="logout-dialog-title">Подтверждение выхода</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="logout-dialog-description">
+            Вы действительно хотите выйти из аккаунта?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLogoutCancel} color="primary">
+            Отмена
+          </Button>
+          <Button onClick={handleLogoutConfirm} color="error" autoFocus>
+            Выйти
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
